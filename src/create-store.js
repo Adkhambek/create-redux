@@ -10,12 +10,24 @@
   То есть второй компонент при этом сохраняет свою возможность получать обновления из стора.
 */
 
-export function createStore() {
-  const getState = () => 0;
+export function createStore(reducer, state) {
+    let listeners = [];
 
-  const dispatch = () => {};
+    const getState = () => state;
 
-  const subscribe = () => {};
+    const dispatch = (action) => {
+        state = reducer(state, action);
+        listeners.forEach((listener) => listener(state));
+    };
 
-  return { getState, dispatch, subscribe };
+    const subscribe = (listener) => {
+        listeners.push(listener);
+        return () => {
+            listeners.splice(listeners.indexOf(listener), 1);
+        };
+    };
+
+    dispatch({});
+
+    return { getState, dispatch, subscribe };
 }
